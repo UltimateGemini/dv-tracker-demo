@@ -1,5 +1,7 @@
 {
   "name": "dvTrackerDemo",
-  "integrations": {},
+  "integrations": {
+    "capacitor": {}
+  },
   "type": "angular"
 }
