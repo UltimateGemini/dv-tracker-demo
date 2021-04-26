@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component } from '@angular/core';
 import {
   NativeGeocoder,
   NativeGeocoderResult,
@@ -6,23 +6,8 @@ import {
 } from '@ionic-native/native-geocoder/ngx';
 
 import { Plugins } from '@capacitor/core';
-const { Geolocation, Storage } = Plugins;
-
-interface ULocation {
-  id: number;
-  accuracy: number;
-  altitude?: number;
-  altitudeAccuracy?: number;
-  latitude: number;
-  longitude: number;
-  heading?: number;
-  speed?: number;
-  timestamp: number;
-  fullAddress: string;
-  shortAddress: string;
-  locality: string;
-
-}
+import { StorageService } from '../services/storage.service';
+const { Geolocation } = Plugins;
 
 @Component({
   selector: 'app-folder',
@@ -33,35 +18,32 @@ export class FolderPage {
   latitude: number;
   longitude: number;
   address: string;
-  locationObj: ULocation = <ULocation>{};
-  savedData: any;
+  locationObj: Location = <Location>{};
 
-  constructor(private nativeGeocoder: NativeGeocoder) {
+  constructor(
+    private nativeGeocoder: NativeGeocoder,
+    private storage: StorageService
+  ) {
     this.getLocation();
   }
 
   async getLocation() {
     const position = await Geolocation.getCurrentPosition();
-    //console.log('Current Position: ', position);
+    console.log('Current Position: ', position);
 
     this.latitude = position.coords.latitude;
     this.longitude = position.coords.longitude;
 
     this.locationObj.id = Math.floor(Math.random() * 100);
     this.locationObj.accuracy = position.coords.accuracy;
-    this.locationObj.altitude = position.coords.altitude
+    this.locationObj.altitude = position.coords.altitude;
     this.locationObj.altitudeAccuracy = position.coords.altitudeAccuracy;
     this.locationObj.latitude = position.coords.latitude;
     this.locationObj.longitude = position.coords.longitude;
     this.locationObj.heading = position.coords.heading;
     this.locationObj.speed = position.coords.speed;
     this.locationObj.timestamp = position.timestamp;
-    // console.log('locationObj', this.locationObj);
 
-    // Sets obj in localstorage
-    // this.setObject(this.locationObj);
-    // this.getItem();
-    
     this.reverseGeocodeLocation(this.latitude, this.longitude);
   }
 
@@ -74,7 +56,7 @@ export class FolderPage {
       .reverseGeocode(lat, long, options)
       .then((result: NativeGeocoderResult[]) => {
         let loc = result[0];
-        //console.log('Reversed Location: ', loc);
+
         this.address = loc.subThoroughfare
           .concat(' ', loc.thoroughfare)
           .concat(' ', loc.locality)
@@ -82,28 +64,20 @@ export class FolderPage {
           .concat(' ', loc.postalCode);
 
         this.locationObj.fullAddress = this.address;
-        this.locationObj.shortAddress = loc.subThoroughfare.concat(' ', loc.thoroughfare);
-        this.locationObj.locality = loc.locality.concat(', ', loc.administrativeArea).concat(' ', loc.postalCode);
-        // console.log('locationObj: ', this.locationObj);
+        this.locationObj.shortAddress = loc.subThoroughfare.concat(
+          ' ',
+          loc.thoroughfare
+        );
+        this.locationObj.locality = loc.locality
+          .concat(', ', loc.administrativeArea)
+          .concat(' ', loc.postalCode);
+
         // Sets obj in localstorage
-        this.setObject(this.locationObj);
+        this.storage.setObject(this.locationObj);
+
         // Gets obj in localstorage
-        this.getItem();
+        this.storage.getItem();
       })
       .catch((error: any) => console.log(error));
-  }
-
-  async setObject(locationObj: ULocation) {
-    await Storage.set({
-      key: 'user-location',
-      value: JSON.stringify(locationObj)
-    });
-  }
-
-  async getItem() {
-    const { value } = await Storage.get({ key: 'user-location' });
-    console.log('Storage: ', value);
-    this.savedData = JSON.stringify(JSON.parse(value), null, 10) ;
-    console.log('retrievedObject: ', this.savedData);
   }
 }
