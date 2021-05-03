@@ -1,4 +1,4 @@
-interface Location {
+export interface UserLocation {
   id: number;
   accuracy: number;
   altitude?: number;

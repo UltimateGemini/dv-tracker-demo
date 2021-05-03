@@ -1,0 +1,11 @@
+{
+  "targets": {
+    "dv-tracker-demo": {
+      "hosting": {
+        "app": [
+          "dv-tracker-demo"
+        ]
+      }
+    }
+  }
+}

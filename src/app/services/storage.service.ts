@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { UserLocation } from '../models/UserLocation';
 
 import { Plugins } from '@capacitor/core';
 const { Geolocation, Storage } = Plugins;
@@ -11,7 +12,7 @@ export class StorageService {
   
   constructor() { }
 
-  async setObject(locationObj: Location) {
+  async setObject(locationObj: UserLocation) {
     await Storage.set({
       key: 'user-location',
       value: JSON.stringify(locationObj)

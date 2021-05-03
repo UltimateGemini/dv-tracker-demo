@@ -4,9 +4,10 @@ import {
   NativeGeocoderResult,
   NativeGeocoderOptions,
 } from '@ionic-native/native-geocoder/ngx';
+import { StorageService } from '../services/storage.service';
+import { UserLocation } from '../models/UserLocation';
 
 import { Plugins } from '@capacitor/core';
-import { StorageService } from '../services/storage.service';
 const { Geolocation } = Plugins;
 
 @Component({
@@ -18,7 +19,7 @@ export class FolderPage {
   latitude: number;
   longitude: number;
   address: string;
-  locationObj: Location = <Location>{};
+  locationObj: UserLocation = <UserLocation>{};
 
   constructor(
     private nativeGeocoder: NativeGeocoder,
